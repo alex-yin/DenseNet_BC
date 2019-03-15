@@ -80,32 +80,25 @@ def run_gtsrb(batch_size,
 
     X_train = X_train.astype('float32')
     X_test = X_test.astype('float32')
+    X_train = X_train * 1/255
+    X_test = X_test * 1/255
 
     # Normalisation
-    X = np.vstack((X_train, X_test))
+    # X = np.vstack((X_train, X_test))
     # 2 cases depending on the image ordering
-    if K.image_data_format() == "channels_first":
-        for i in range(n_channels):
-            mean = np.mean(X[:, i, :, :])
-            std = np.std(X[:, i, :, :])
-            X_train[:, i, :, :] = (X_train[:, i, :, :] - mean) / std
-            X_test[:, i, :, :] = (X_test[:, i, :, :] - mean) / std
+    # if K.image_data_format() == "channels_first":
+    #     for i in range(n_channels):
+    #         mean = np.mean(X[:, i, :, :])
+    #         std = np.std(X[:, i, :, :])
+    #         X_train[:, i, :, :] = (X_train[:, i, :, :] - mean) / std
+    #         X_test[:, i, :, :] = (X_test[:, i, :, :] - mean) / std
 
-    elif K.image_data_format() == "channels_last":
-        for i in range(n_channels):
-            mean = np.mean(X[:, :, :, i])
-            std = np.std(X[:, :, :, i])
-            X_train[:, :, :, i] = (X_train[:, :, :, i] - mean) / std
-            X_test[:, :, :, i] = (X_test[:, :, :, i] - mean) / std
-
-    ####################
-    # Network profiling#
-    ####################
-    batch_shape = (batch_size, ) + img_dim
-    repeat = 25
-
-    model_latency, model_CI = sample_latency_ANN(model, batch_shape, repeat)
-    print(model_latency)
+    # elif K.image_data_format() == "channels_last":
+    #     for i in range(n_channels):
+    #         mean = np.mean(X[:, :, :, i])
+    #         std = np.std(X[:, :, :, i])
+    #         X_train[:, :, :, i] = (X_train[:, :, :, i] - mean) / std
+    #         X_test[:, :, :, i] = (X_test[:, :, :, i] - mean) / std
 
     ###################
     # Construct model #
@@ -129,6 +122,15 @@ def run_gtsrb(batch_size,
     # if plot_architecture:
     #     from keras.utils.visualize_util import plot
     #     plot(model, to_file='./figures/densenet_archi.png', show_shapes=True)
+
+    ####################
+    # Network profiling#
+    ####################
+    batch_shape = (batch_size, ) + img_dim
+    repeat = 25
+
+    model_latency, model_CI = sample_latency_ANN(model, batch_shape, repeat)
+    print(model_latency)
 
 
     ####################
